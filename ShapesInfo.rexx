@@ -1,7 +1,7 @@
 /* Display information about Blitz Basic .shapes file,
    optionally displaying the shape's cookiecut
 $AUTHOR: Iggy Drougge 2016
-$VER: 1.1
+$VER: 1.2
 */
 PARSE ARG argument
 template = 'FROM/N TO/N SHOW/S FILE/A'
@@ -10,10 +10,10 @@ IF argument = '' | argument = '?' THEN DO
    EXIT 0
    END
 
-CALL ReadArgs()
+CALL ReadArgs
 
 IF ~Open(fh,args.file,READ) then DO
-   SAY "Couldn't Open file:" args.file
+   SAY "Couldn't open file:" args.file
    EXIT 10
    END
 
@@ -29,8 +29,7 @@ DO WHILE ~EOF(fh)
       EXIT 0
       END
    PARSE VALUE header WITH pixwidth +2 pixheight +2 depth +2 ebwidth +2 bltsize +2 xhandle +2 yhandle +2 . +4 . +4 onebpmem +2 onebpmemx +2 allbpmem +2 allbpmemx +2 .
-   CALL CheckHeader
-   IF filebad THEN DO
+   IF ~CheckHeader() THEN DO
       SAY 'Not a valid shapes file.'
       SAY C2X(header)
       EXIT 10
@@ -50,9 +49,9 @@ DO WHILE ~EOF(fh)
 EXIT 0
 
 CheckHeader:
-   IF C2D(pixwidth)>C2D(ebwidth)*8 THEN filebad=1
-   IF Left(C2B(bltsize),10)~=C2B(pixheight) THEN filebad=1
-RETURN
+   IF C2D(pixwidth)>C2D(ebwidth)*8 THEN RETURN 0
+   IF Left(C2B(bltsize),10)~=C2B(pixheight) THEN RETURN 0
+RETURN 1
 
 PrintHeader:
    SAY 'Shape #' || shape# || ':'
@@ -114,9 +113,7 @@ DO WHILE argument ~= ''
             WHEN keytype='K' | keytype='N' | keytype='A' THEN DO
                IF Index(arg1,'=')>0
                   THEN DO
-                     SAY 'Innehåller ='
                      PARSE VAR arg1 '=' arg2
-                     SAY 'arg2:' arg2
                      END
                   ELSE PARSE VAR argument arg2 argument
                args.key=arg2
