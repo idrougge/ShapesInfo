@@ -18,7 +18,6 @@ IF ~Open(fh,args.file,READ) then DO
    END
 
 shape#=0
-filebad=0
 IF args.to=0 THEN args.to=9999
 
 IF args.from>1 THEN SAY 'Seeking...'
@@ -38,13 +37,13 @@ DO WHILE ~EOF(fh)
    bitplanesize = C2D(ebwidth) * C2D(pixheight)
    bitmapsize = bitplanesize * C2D(depth)
    IF shape# < args.from THEN DO
-      CALL Seek(fh,bitmapsize,CURRENT)
+      CALL Seek fh,bitmapsize,CURRENT
       ITERATE
       END
    IF shape# > args.to THEN LEAVE
    CALL PrintHeader
    IF args.show THEN CALL ShowCookiecut
-   ELSE CALL Seek(fh,bitmapsize,CURRENT)
+   ELSE CALL Seek fh,bitmapsize,CURRENT
    END
 EXIT 0
 
